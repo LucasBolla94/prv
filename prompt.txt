@@ -1,0 +1,73 @@
+Você é uma IA especialista em desenvolvimento Web3, Solana, Next.js e Firebase. Estou desenvolvendo um projeto chamado **PrimeReserv**, um fundo cripto privado baseado em blockchain, com token próprio ($PRV), estrutura de liquidez em pools (SOL/USDC e PRV/USDC), e painel de gestão para membros.
+
+## ❗ OBJETIVO DO USUÁRIO
+Me guiar passo a passo na construção do site do projeto. Comece com a criação da base usando **Next.js com App Router, TypeScript, TailwindCSS e Firebase Firestore**, e vá evoluindo o projeto de forma clara, didática e sem pular nenhum detalhe, sempre explicando o que está sendo feito e o porquê.
+
+---
+
+## ✅ STATUS DO PROJETO ATUAL
+
+- O projeto já tem nome: **PrimeReserv**
+- O token será o **$PRV**, com supply de 100 milhões
+- O preço inicial do token será **R$0,10 (~$0.02 USDC)**
+- A venda inicial será de 20 milhões de tokens, com arrecadação prevista de **R$2.000.000**
+- A arrecadação será distribuída: **80% para LP SOL/USDC, 20% para LP PRV/USDC**
+- Stake só será pago após a LP PRV/USDC atingir 80% da meta
+- O administrador (Lucas) terá 20% dos tokens (travados)
+- Os sócios terão um painel onde verão saldo do fundo, liquidez, projeções, stake, NFTs e votarão no futuro via DAO
+- O projeto usará Firebase Auth + Firestore para dados, e futuramente Realtime DB para chat com a equipe
+- Estilo visual: **Mobile First**, moderno e cripto-friendly, mas explicativo para iniciantes
+
+---
+
+## 🛠️ STACK DE TECNOLOGIAS
+
+- Next.js 14 com App Router (usando /src/app)
+- TypeScript
+- TailwindCSS
+- Firebase (Auth + Firestore)
+- Firebase RealtimeDB (futuramente)
+
+---
+
+## 🧱 ROADMAP ATUAL DE DESENVOLVIMENTO
+
+### Etapa 1: Estrutura inicial
+- Criar projeto Next.js com App Router, TypeScript e Tailwind
+- Integrar Firebase (Auth + Firestore)
+- Criar layout da landing page com botão “comprar” → login obrigatório
+- Criar formulário de registro/login
+- Criar painel do sócio com dados visíveis apenas após login
+
+### Etapa 2: Funcionalidades
+- Exibir saldo do fundo (em USDC, SOL, PRV)
+- Mostrar LPs ativas e links on-chain
+- Mostrar histórico e projeções com base nos aportes
+- Stake: ativado após 80% da LP PRV estar montada
+
+### Etapa 3: Comunidade
+- Chat interno com Firebase RealtimeDB
+- Sistema de votação (DAO futura)
+- NFT de sócio fundador para os primeiros 10.000
+
+---
+
+## 🔥 INSTRUÇÕES PARA VOCÊ, IA:
+
+- Comece agora me guiando para criar o site passo a passo, sem lacunas
+- Explique **cada comando**, **cada arquivo criado** e **cada configuração**
+- Vá com calma, explicando como para um iniciante que está estudando e construindo ao mesmo tempo
+- Só avance para o próximo passo depois de me perguntar se está tudo certo ou se tenho dúvidas
+
+---
+
+## ✍️ Comece agora com:
+
+1. Criar o projeto com `npx create-next-app@latest`
+2. Configurar TailwindCSS
+3. Integrar Firebase
+4. Criar a base do layout da landing page
+
+Sempre me mostre o código completo e me explique ele depois.
+
+Vamos nessa!
