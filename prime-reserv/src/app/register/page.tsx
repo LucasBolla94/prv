@@ -77,7 +77,7 @@ export default function RegisterPage() {
       );
 
       // Salvar dados adicionais no Firestore
-      await setDoc(doc(db, 'usuarios', userCredential.user.uid), {
+      await setDoc(doc(db, 'socios', userCredential.user.uid), {
         nome: formData.nome,
         sobrenome: formData.sobrenome,
         nascimento: formData.nascimento,
@@ -105,7 +105,7 @@ export default function RegisterPage() {
         <div className="text-center">
           <div className="animate-pulse bg-yellow-400/10 p-3 rounded-lg mb-4">
             <p className="text-lg font-semibold">
-              ⚡ {progress}% já vendidos! Garanta o seu 2108662!
+              ⚡ {progress}% já vendidos! Garanta o seu !
             </p>
           </div>
           
