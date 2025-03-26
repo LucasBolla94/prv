@@ -12,22 +12,20 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Estados do formulário
   const [formData, setFormData] = useState({
-    email: '',
     nome: '',
     sobrenome: '',
-    nascimento: '',
+    email: '',
+    cpf: '',
+    dataNascimento: '',
     senha: '',
     confirmaSenha: '',
-    whatsapp: '',
     termos: false,
     maiorIdade: false
   });
 
-   // Animação da barra de progresso (ÚNICA ALTERAÇÃO)
-   useEffect(() => {
-    const totalTime = 10 * 60 * 1000; // 5 minutos
+  useEffect(() => {
+    const totalTime = 10 * 60 * 1000;
     const start = 16;
     const end = 64;
     const steps = end - start;
@@ -40,52 +38,69 @@ export default function RegisterPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Formatador de WhatsApp
-  const formatWhatsApp = (value: string) => {
+  const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, '');
-    const match = numbers.match(/^(\d{0,2})(\d{0,5})(\d{0,4})$/);
+    const match = numbers.match(/^(\d{0,3})(\d{0,3})(\d{0,3})(\d{0,2})$/);
     
     if (!match) return '';
     return [
-      match[1] ? `(${match[1]}` : '',
-      match[2] ? `) ${match[2]}` : '',
-      match[3] ? `-${match[3]}` : ''
+      match[1],
+      match[2] ? `.${match[2]}` : '',
+      match[3] ? `.${match[3]}` : '',
+      match[4] ? `-${match[4]}` : ''
     ].join('');
   };
 
-  // Manipulação de envio
+  const calculateAge = (birthDate: string) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
 
     try {
-      // Validações
       if (formData.senha !== formData.confirmaSenha) {
         throw new Error('As senhas não coincidem');
       }
 
       if (!formData.termos || !formData.maiorIdade) {
-        throw new Error('Aceite os termos para continuar');
+        throw new Error('Você deve aceitar os termos e confirmar que é maior de idade');
       }
 
-      // Criar usuário no Firebase Auth
+      if (formData.cpf.length !== 11) {
+        throw new Error('CPF inválido');
+      }
+
+      if (calculateAge(formData.dataNascimento) < 18) {
+        throw new Error('Você deve ter pelo menos 18 anos para se cadastrar');
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.senha
       );
 
-      // Salvar dados adicionais no Firestore
-      await setDoc(doc(db, 'socios', userCredential.user.uid), {
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
         nome: formData.nome,
         sobrenome: formData.sobrenome,
-        nascimento: formData.nascimento,
-        whatsapp: `+55${formData.whatsapp}`,
+        email: formData.email,
+        cpf: formData.cpf,
+        dataNascimento: formData.dataNascimento,
+        socio: false,
         criadoEm: new Date().toISOString()
       });
 
-      // Redirecionamento após breve animação
       setTimeout(() => router.push('/dashboard'), 2500);
       
     } catch (err) {
@@ -101,7 +116,6 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 text-white px-6 py-10 flex flex-col items-center">
       <div className="max-w-md w-full space-y-6">
-        {/* Cabeçalho Urgente */}
         <div className="text-center">
           <div className="animate-pulse bg-yellow-400/10 p-3 rounded-lg mb-4">
             <p className="text-lg font-semibold">
@@ -109,7 +123,6 @@ export default function RegisterPage() {
             </p>
           </div>
           
-          {/* Barra de Progresso Animada */}
           <div className="w-full bg-gray-700 rounded-full h-4 mb-6 relative overflow-hidden">
             <div 
               className="bg-yellow-400 h-4 rounded-full transition-all duration-1000 relative"
@@ -120,33 +133,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Formulário */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Campo WhatsApp Melhorado */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              WhatsApp (Obrigatório) *
-            </label>
-            <div className="flex gap-2">
-              <div className="flex items-center px-3 bg-black/30 rounded-lg border border-gray-600">
-                <span className="text-gray-400">+55</span>
-              </div>
-              <input
-                type="tel"
-                required
-                className="w-full px-4 py-3 bg-black/30 rounded-lg focus:ring-2 focus:ring-yellow-400"
-                placeholder="(00) 00000-0000"
-                value={formatWhatsApp(formData.whatsapp)}
-                onChange={(e) => {
-                  const rawValue = e.target.value.replace(/\D/g, '');
-                  setFormData({...formData, whatsapp: rawValue});
-                }}
-                maxLength={15}
-              />
-            </div>
-            <p className="text-sm text-gray-400 mt-1">Exemplo: (11) 98765-4321</p>
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Nome *</label>
@@ -171,13 +158,29 @@ export default function RegisterPage() {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1">CPF *</label>
+            <input
+              type="text"
+              required
+              className="w-full px-4 py-3 bg-black/30 rounded-lg"
+              placeholder="000.000.000-00"
+              value={formatCPF(formData.cpf)}
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/\D/g, '');
+                setFormData({...formData, cpf: rawValue});
+              }}
+              maxLength={14}
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1">Data de Nascimento *</label>
             <input
               type="date"
               required
               className="w-full px-4 py-3 bg-black/30 rounded-lg"
-              value={formData.nascimento}
-              onChange={(e) => setFormData({...formData, nascimento: e.target.value})}
+              value={formData.dataNascimento}
+              onChange={(e) => setFormData({...formData, dataNascimento: e.target.value})}
             />
           </div>
 
@@ -215,7 +218,6 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Checkboxes */}
           <div className="space-y-3">
             <label className="flex items-center space-x-2">
               <input
@@ -262,7 +264,6 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        {/* Novas Animações */}
         <div className="flex justify-center items-center gap-2 text-yellow-400 animate-bounce">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -270,7 +271,6 @@ export default function RegisterPage() {
           <span>+428 pessoas compraram hoje</span>
         </div>
 
-        {/* Modal de Termos */}
         {showTerms && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
             <div className="bg-gray-900 max-w-2xl p-6 rounded-xl">
@@ -290,7 +290,6 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* Animação de Sucesso */}
         {isSubmitting && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
             <div className="text-center space-y-4">
@@ -301,7 +300,6 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* CSS das Animações */}
         <style jsx>{`
           @keyframes glow {
             0% { opacity: 0.3; }
