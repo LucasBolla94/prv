@@ -26,7 +26,7 @@ export default function RegisterPage() {
   });
 
   useEffect(() => {
-    const totalTime = 10 * 60 * 1000;
+    const totalTime = 20 * 60 * 1000;
     const start = 16;
     const end = 64;
     const steps = end - start;
